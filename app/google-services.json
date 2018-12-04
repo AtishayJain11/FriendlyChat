@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "690393778402",
+    "firebase_url": "https://newfirebaseapplication-74f6f.firebaseio.com",
+    "project_id": "newfirebaseapplication-74f6f",
+    "storage_bucket": "newfirebaseapplication-74f6f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:690393778402:android:859aa38345cbc2ba",
+        "android_client_info": {
+          "package_name": "project.beryl.com.newfirebaseapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "690393778402-jh8el2ee5fslqd913pbi8l97f9uo1188.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "project.beryl.com.newfirebaseapplication",
+            "certificate_hash": "61e72a406952eb740bacdf1f79bd35c43c87b6e0"
+          }
+        },
+        {
+          "client_id": "690393778402-a8ev64mj4peqii51i7jhsq5j8vn8f9r7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALgNoSbpoF5JWPNVaVmOI5odeH2-TA-Cg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "690393778402-a8ev64mj4peqii51i7jhsq5j8vn8f9r7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,4 +1,4 @@
-package project.beryl.com.newfirebaseapplication;
+package project.beryl.com.newfirebaseapplication.adapter;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,6 +11,9 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
+
+import project.beryl.com.newfirebaseapplication.model.FriendlyMessage;
+import project.beryl.com.newfirebaseapplication.R;
 
 public class MessageAdapter extends ArrayAdapter<FriendlyMessage> {
     public MessageAdapter(Context context, int resource, List<FriendlyMessage> objects) {

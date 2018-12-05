@@ -1,6 +1,7 @@
-package project.beryl.com.newfirebaseapplication;
+package project.beryl.com.newfirebaseapplication.Activity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -20,8 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.IdpResponse;
-import com.firebase.ui.auth.data.model.User;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -29,10 +29,17 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import project.beryl.com.newfirebaseapplication.R;
+import project.beryl.com.newfirebaseapplication.adapter.MessageAdapter;
+import project.beryl.com.newfirebaseapplication.model.FriendlyMessage;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,7 +58,12 @@ public class MainActivity extends AppCompatActivity {
     private ChildEventListener mChildEventListener;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private FirebaseStorage mFirebaseStorage;
+    private StorageReference mChatPhotosStorageReference;
+
     public static final int RC_SIGN_IN = 1;
+    public static final int RC_PHOTO_PICKER = 2;
+    Boolean boolForPhototPicker = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +72,13 @@ public class MainActivity extends AppCompatActivity {
 
         mUsername = ANONYMOUS;
 
+        // Initialize firebase components
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseStorage = FirebaseStorage.getInstance();
+
         mMessageDatabaseReference = mFirebaseDatabase.getReference().child("messages");
+        mChatPhotosStorageReference = mFirebaseStorage.getReference().child("chat_photos");
 
         // Initialize references to views
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -83,7 +99,11 @@ public class MainActivity extends AppCompatActivity {
         mPhotoPickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: Fire an intent to show an image picker
+                boolForPhototPicker = true;
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/jpeg");
+                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                startActivityForResult(Intent.createChooser(intent, "Complete action using"), RC_PHOTO_PICKER);
             }
         });
 
@@ -129,24 +149,13 @@ public class MainActivity extends AppCompatActivity {
 
                 if (user != null) {
                     //User signed in
-                    Toast.makeText(MainActivity.this, "You are now signed in, welcom to friendly chat!!!", Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(MainActivity.this, "You are now signed in, welcom to friendly chat!!!", Toast.LENGTH_SHORT).show();
                     onSignedInInitiliaze(user.getDisplayName());
                 } else {
                     //User signed out
                     // Choose authentication providers
                     onSignedOutCleanup();
-                    List<AuthUI.IdpConfig> providers = Arrays.asList(
-                            new AuthUI.IdpConfig.EmailBuilder().build(),
-                            new AuthUI.IdpConfig.GoogleBuilder().build());
-
-// Create and launch sign-in intent
-                    startActivityForResult(
-                            AuthUI.getInstance()
-                                    .createSignInIntentBuilder()
-                                    .setIsSmartLockEnabled(false)
-                                    .setAvailableProviders(providers)
-                                    .build(),
-                            RC_SIGN_IN);
+                    createSignInIntent();
                 }
 
             }
@@ -199,6 +208,25 @@ public class MainActivity extends AppCompatActivity {
         detachDatabaseReadListener();
     }
 
+    public void createSignInIntent() {
+        // [START auth_fui_create_intent]
+        // Choose authentication providers
+        List<AuthUI.IdpConfig> providers = Arrays.asList(
+                new AuthUI.IdpConfig.EmailBuilder().build(),
+                new AuthUI.IdpConfig.PhoneBuilder().build(),
+                new AuthUI.IdpConfig.GoogleBuilder().build());
+
+        // Create and launch sign-in intent
+        startActivityForResult(
+                AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setAvailableProviders(providers)
+                        .build(),
+                RC_SIGN_IN);
+        // [END auth_fui_create_intent]
+    }
+
+
     private void attacheDatabaseReadListener() {
         if (mChildEventListener == null) {
             mChildEventListener = new ChildEventListener() {
@@ -243,13 +271,29 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == RC_SIGN_IN) {
-            IdpResponse response = IdpResponse.fromResultIntent(data);
-
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                Toast.makeText(this, "Sign in success " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
+                if (requestCode == RC_SIGN_IN) {
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    Toast.makeText(this, "Sign in success " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
+                }else if (requestCode == RC_PHOTO_PICKER){
+                    //Get a reference to store file at chat _photos/<FILENAME>
+                    final Uri selectedImageUri = data.getData();
+                    final StorageReference photoRef = mChatPhotosStorageReference.child(selectedImageUri.getLastPathSegment());
+                    //Upload file to firebase storage
+                    photoRef.putFile(selectedImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            photoRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    FriendlyMessage friendlyMessage = new FriendlyMessage(null,mUsername,uri.toString());
+                                    mMessageDatabaseReference.push().setValue(friendlyMessage);
+                                }
+                            });
+                        }
+                    });
+                }
             } else {
                 // Sign in failed. If response is null the user canceled the
                 // sign-in flow using the back button. Otherwise check
@@ -257,5 +301,4 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Sign in failed.", Toast.LENGTH_SHORT).show();
             }
         }
-    }
 }

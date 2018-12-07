@@ -8,4 +8,43 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="Sansation_Light">
+        <item name="fontType">Sansation_Light</item>
+    </style>
+
+    <style name="Sansation_Regular">
+        <item name="fontType">Sansation_Regular</item>
+    </style>
+
+    <style name="Sansation_Bold">
+        <item name="fontType">Sansation_Bold</item>
+    </style>
+    <style name="Pacifico">
+        <item name="fontType">Pacifico</item>
+    </style>
+
+    <style name="Gotham_Light">
+        <item name="fontType">Gotham_Light</item>
+    </style>
+
+    <style name="Gotham_Book">
+        <item name="fontType">Gotham_Book</item>
+    </style>
+
+    <style name="Gotham_Medium">
+        <item name="fontType">Gotham_Medium</item>
+    </style>
+
+    <style name="Gotham_Bold">
+        <item name="fontType">Gotham_Bold</item>
+    </style>
+
+    <style name="Gothan_BookItalic">
+        <item name="fontType">Gotham_BookItalic</item>
+    </style>
+
+    <style name="Gotham_Black">
+        <item name="fontType">Gotham_Black</item>
+    </style>
+
 </resources>

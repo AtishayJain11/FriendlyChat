@@ -50,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
     private EditText mMessageEditText;
     private Button mSendButton;
     private String mUsername;
+    private String user_id;
+    private String user_email;
     public static final String ANONYMOUS = "anonymous";
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 1000;
 
@@ -71,13 +73,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mUsername = ANONYMOUS;
-
+        Intent intent = getIntent();
+       user_id = intent.getStringExtra("user_id");
+        user_email = intent.getStringExtra("user_email");
         // Initialize firebase components
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseStorage = FirebaseStorage.getInstance();
 
-        mMessageDatabaseReference = mFirebaseDatabase.getReference().child("messages");
+        mMessageDatabaseReference = mFirebaseDatabase.getReference().child("messages").child(user_email);
         mChatPhotosStorageReference = mFirebaseStorage.getReference().child("chat_photos");
 
         // Initialize references to views
@@ -134,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // TODO: Send messages on click
-                FriendlyMessage friendlyMessage = new FriendlyMessage(mMessageEditText.getText().toString(), mUsername, null);
+                FriendlyMessage friendlyMessage = new FriendlyMessage(mMessageEditText.getText().toString(), mUsername, null,user_id);
                 mMessageDatabaseReference.push().setValue(friendlyMessage);
                 // Clear input box
                 mMessageEditText.setText("");
@@ -178,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
         mMessageAdapter.clear();
     }
 
-    @Override
+ /*   @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
@@ -195,8 +199,7 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
+    }*/
     private void onSignedInInitiliaze(String userName) {
         mUsername = userName;
         attacheDatabaseReadListener();
@@ -233,7 +236,9 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                     FriendlyMessage friendlyMessage = dataSnapshot.getValue(FriendlyMessage.class);
-                    mMessageAdapter.add(friendlyMessage);
+                    if (user_id.equals(friendlyMessage.getUserId())){
+                        mMessageAdapter.add(friendlyMessage);
+                    }
                 }
 
                 @Override
@@ -273,8 +278,9 @@ public class MainActivity extends AppCompatActivity {
 
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
+                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if (requestCode == RC_SIGN_IN) {
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
                     Toast.makeText(this, "Sign in success " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
                 }else if (requestCode == RC_PHOTO_PICKER){
                     //Get a reference to store file at chat _photos/<FILENAME>
@@ -287,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
                             photoRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                 @Override
                                 public void onSuccess(Uri uri) {
-                                    FriendlyMessage friendlyMessage = new FriendlyMessage(null,mUsername,uri.toString());
+                                    FriendlyMessage friendlyMessage = new FriendlyMessage(null,mUsername,uri.toString(),user.getUid());
                                     mMessageDatabaseReference.push().setValue(friendlyMessage);
                                 }
                             });

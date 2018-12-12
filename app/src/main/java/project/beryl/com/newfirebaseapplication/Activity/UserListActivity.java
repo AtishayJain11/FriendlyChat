@@ -14,6 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.data.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,17 +26,22 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.security.Provider;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import project.beryl.com.newfirebaseapplication.R;
 import project.beryl.com.newfirebaseapplication.adapter.UserListAdapter;
+import project.beryl.com.newfirebaseapplication.model.FriendlyMessage;
 import project.beryl.com.newfirebaseapplication.model.UserModel;
+import project.beryl.com.newfirebaseapplication.utils.ParameterConstants;
 
 public class UserListActivity extends AppCompatActivity {
+    String TAG = "tag";
     private String mUsername;
     public static final String ANONYMOUS = "anonymous";
     public static final int RC_SIGN_IN = 1;
@@ -50,6 +56,7 @@ public class UserListActivity extends AppCompatActivity {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     List<UserModel> userList;
+    ValueEventListener firstValueListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +71,8 @@ public class UserListActivity extends AppCompatActivity {
         // Initialize firebase components
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
-        mUserDatabaseReference = mFirebaseDatabase.getReference().child("user");
-
+        mUserDatabaseReference = mFirebaseDatabase.getReference().child(ParameterConstants.USER);
+        //  mUserDatabaseReference.addValueEventListener(firstValueListener);
         // Initialize message ListView and its adapter
         userList = new ArrayList<>();
        /* UserModel userModel = new UserModel("PC Patidar", "pcpatidar.4488@gmail.com", "9685830848",null);
@@ -153,7 +160,9 @@ public class UserListActivity extends AppCompatActivity {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                     UserModel userModel = dataSnapshot.getValue(UserModel.class);
-                    mUserListAdapter.add(userModel);
+                    if (!userModel.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                        mUserListAdapter.add(userModel);
+                    }
                 }
 
                 @Override
@@ -204,31 +213,40 @@ public class UserListActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             // Successfully signed in
             if (requestCode == RC_SIGN_IN) {
+                Toast.makeText(this, "SignIn Successfully.", Toast.LENGTH_SHORT).show();
                 final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                mFirebaseAuth.fetchProvidersForEmail(user.getEmail()).addOnCompleteListener(new OnCompleteListener<ProviderQueryResult>() {
+               // UserModel userModel = new UserModel(user.getDisplayName(), user.getUid(), user.getEmail(), user.getPhoneNumber(), user.getPhotoUrl().toString());
+              //  mUserDatabaseReference.push().setValue(userModel);
+                getAllRecord(user);
+                // mUserDatabaseReference.addValueEventListener(firstValueListener);
+                //  DatabaseReference reference = database.getReference("Stats").child("Matematik");
+               /* final FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference reference = database.getReference("user");
+                reference.addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onComplete(@NonNull Task<ProviderQueryResult> task) {
-                        Toast.makeText(getApplicationContext(), "yes  ", Toast.LENGTH_SHORT).show();
-                        UserModel userModel = new UserModel(user.getDisplayName(),user.getUid(),user.getEmail(),user.getPhoneNumber(), user.getPhotoUrl().toString());
-                        mUserDatabaseReference.push().setValue(userModel);
-                       /* Boolean check = !task.getResult().getProviders().isEmpty();
-                        if (check){
-                            Toast.makeText(getApplicationContext(), "yes  ", Toast.LENGTH_SHORT).show();
-                            UserModel userModel = new UserModel(user.getDisplayName(),user.getUid(),user.getEmail(),user.getPhoneNumber(), user.getPhotoUrl().toString());
-                            mUserDatabaseReference.push().setValue(userModel);
-                        }else {
-                            Toast.makeText(getApplicationContext(), "no ", Toast.LENGTH_SHORT).show();
-                        }*/
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        // dataSnapshot value will be Matematik, {ahmetozrahat=50, nihatkeklik=50}
+                        // because it is indeed the value we need
+
+                        // But you want key value pair to be added to your stats
+                        // So we can just loop through the values
+
+                        for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                           // stats.put(childSnapshot.getKey(), childSnapshot.getValue().toString());
+                            if (!user.getUid().equals(childSnapshot.getValue().toString())){
+                                UserModel userModel = new UserModel(user.getDisplayName(),user.getUid(),user.getEmail(),user.getPhoneNumber(),user.getPhotoUrl().toString());
+                                mUserDatabaseReference.push().setValue(userModel);
+                            }
+                        }
+                       // StatsAdapter adapter = new StatsAdapter(stats);
+                      //  listView.setAdapter(adapter);
                     }
-                });
-               /* if (checkEmailPresent(user.getEmail())){
-                    Toast.makeText(this, "yes  ", Toast.LENGTH_SHORT).show();
-                    UserModel userModel = new UserModel(user.getDisplayName(),user.getUid(),user.getEmail(),user.getPhoneNumber(), user.getPhotoUrl().toString());
-                    mUserDatabaseReference.push().setValue(userModel);
-                }else {
-                    Toast.makeText(this, "no ", Toast.LENGTH_SHORT).show();
-                }*/
-                Toast.makeText(this, "SignIn successfully " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });*/
             }
         } else {
             // Sign in failed. If response is null the user canceled the
@@ -242,50 +260,53 @@ public class UserListActivity extends AppCompatActivity {
 
     Boolean bool = false;
 
-    public Boolean checkEmailPresent(final String userEmail){
-            mFirebaseAuth.fetchProvidersForEmail(userEmail).addOnCompleteListener(new OnCompleteListener<ProviderQueryResult>() {
-                @Override
-                public void onComplete(@NonNull Task<ProviderQueryResult> task) {
-                    bool = !task.getResult().getProviders().isEmpty();
-                }
-            });
+    public Boolean checkEmailPresent(final String userEmail) {
+        mFirebaseAuth.fetchProvidersForEmail(userEmail).addOnCompleteListener(new OnCompleteListener<ProviderQueryResult>() {
+            @Override
+            public void onComplete(@NonNull Task<ProviderQueryResult> task) {
+                bool = !task.getResult().getProviders().isEmpty();
+            }
+        });
 
         return bool;
     }
 
-    public Boolean userCreate(final String id){
-        Query queryRef = mUserDatabaseReference.orderByChild("user");
-        queryRef.addChildEventListener(new ChildEventListener() {
+    void getAllRecord(final FirebaseUser user) {
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        mUserDatabaseReference = database.getReference(ParameterConstants.USER);
+        mUserDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String previousChild) {
-                Iterable<DataSnapshot> childrenData = dataSnapshot.getChildren();
-                for (DataSnapshot user : childrenData) {
-                    UserModel userModel = user.getValue(UserModel.class);
-                    Log.d("contact:: ", userModel.getEmail() + " " + userModel.getUserId());
-                    if (userModel.getUserId().equals(id)){
-                        bool = true;
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                int i = 0;
+                int flag = 0;
+                if (dataSnapshot.getValue() != null) {
+                    Iterable<DataSnapshot> snapshotIterator = dataSnapshot.getChildren();
+                    long count = dataSnapshot.getChildrenCount();
+                    Iterator<DataSnapshot> iterator = snapshotIterator.iterator();
+                    while (iterator.hasNext()) {
+                        i++;
+                        DataSnapshot snapshot = iterator.next();
+                        final UserModel userModel = (UserModel) snapshot.getValue(UserModel.class);
+                        if (userModel.getUserId().equals(user.getUid())) {
+                            flag = 1;
+                            break;
+                        }
+                        if (i == count) {
+                            break;
+                        }
                     }
+                    if (flag != 1) {
+                        System.out.println("yes");
+                         UserModel userModel = new UserModel(user.getDisplayName(),user.getUid(),user.getEmail(),user.getPhoneNumber(),user.getPhotoUrl().toString());
+                         mUserDatabaseReference.push().setValue(userModel);
+                    }
+                } else {
+                    System.out.println("yes");
+                     UserModel userModel = new UserModel(user.getDisplayName(),user.getUid(),user.getEmail(),user.getPhoneNumber(),user.getPhotoUrl().toString());
+                     mUserDatabaseReference.push().setValue(userModel);
                 }
-               /* UserModel userModel = dataSnapshot.getValue(UserModel.class);
-                if (userModel.getUserId().equals(id)){
-                    bool = true;
-                }
-                System.out.println("aaaaaaaa "+dataSnapshot.getKey() + " was " + userModel.getName());*/
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
             }
 
             @Override
@@ -293,6 +314,6 @@ public class UserListActivity extends AppCompatActivity {
 
             }
         });
-        return bool;
     }
+
 }

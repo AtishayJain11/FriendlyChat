@@ -81,7 +81,8 @@ public class MainActivity extends AppCompatActivity {
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseStorage = FirebaseStorage.getInstance();
 
-        mMessageDatabaseReference = mFirebaseDatabase.getReference().child("messages").child(user_email);
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        mMessageDatabaseReference = mFirebaseDatabase.getReference().child("messages").child(currentUser.getUid()+"KEY"+user_id);
         mChatPhotosStorageReference = mFirebaseStorage.getReference().child("chat_photos");
 
         // Initialize references to views
@@ -280,7 +281,6 @@ public class MainActivity extends AppCompatActivity {
                 // Successfully signed in
                 final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if (requestCode == RC_SIGN_IN) {
-
                     Toast.makeText(this, "Sign in success " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
                 }else if (requestCode == RC_PHOTO_PICKER){
                     //Get a reference to store file at chat _photos/<FILENAME>

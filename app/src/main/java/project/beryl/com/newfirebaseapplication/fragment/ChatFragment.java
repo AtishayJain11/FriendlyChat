@@ -68,8 +68,8 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
                     if (dataSnapshot.child("time").getValue() != null) {
                         time = String.valueOf(dataSnapshot.child("time").getValue().toString());
                     }
-                    if (dataSnapshot.child("image").getValue() != null) {
-                        image = dataSnapshot.child("image").getValue().toString();
+                    if (dataSnapshot.child("thumb_image").getValue() != null) {
+                        image = dataSnapshot.child("thumb_image").getValue().toString();
                     }
                     if (dataSnapshot.child("name").getValue() != null) {
                         name = dataSnapshot.child("name").getValue().toString();

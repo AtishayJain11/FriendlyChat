@@ -70,7 +70,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.MyViewHo
                 }
                 if (dataSnapshot.child("thumb_image").getValue()!=null){
                     if (!dataSnapshot.child("thumb_image").getValue().toString().equals("default")){
-                        Glide.with(mActivity).load(dataSnapshot.child("thumb_image").getValue().toString()).centerCrop().into(holder.ivProfilePic);
+                        Glide.with(mActivity.getApplicationContext()).load(dataSnapshot.child("thumb_image").getValue().toString()).centerCrop().into(holder.ivProfilePic);
                     }
                 }
 

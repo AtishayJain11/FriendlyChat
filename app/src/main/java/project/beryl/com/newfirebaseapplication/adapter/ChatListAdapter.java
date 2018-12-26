@@ -51,7 +51,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.MyView
         holder.tvName.setText(chatlist.get(position).getName());
         holder.tvTime.setText(AppUtils.getInstance().getFormattedDateFromTimestamp(Long.valueOf(chatlist.get(position).getTime())));
         if (chatlist.get(position).getImage()!=null){
-            if(!chatlist.get(position).getImage().equals("default")) {
+            if(!chatlist.get(position).getImage().equals("default") && !chatlist.get(position).getImage().equals("")) {
                 Glide.with(mActivity).load(chatlist.get(position).getImage()).centerCrop().into(holder.ivProfilePic);
             }
         }

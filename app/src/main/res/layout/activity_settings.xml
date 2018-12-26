@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/ll_rootlayout"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Activity.SettingsActivity">
+
+    <include layout="@layout/layout_toolbar"
+        android:background="@null"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary">
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/iv_profile_pic"
+            android:layout_width="@dimen/dp_150"
+            android:layout_height="@dimen/dp_150"
+            android:src="@drawable/ic_chat_image_placeholder"
+            android:layout_margin="@dimen/dp_25"
+            android:layout_gravity="center"
+            />
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#001319">
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color_white"
+            fontPath="OpenSans-Semibold.ttf"
+            android:text="PC Patidar"
+            android:padding="@dimen/dp_10"
+            android:layout_centerHorizontal="true"
+            android:textSize="@dimen/txt_extra_large"/>
+
+        <TextView
+            android:id="@+id/tv_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingLeft="@dimen/dp_15"
+            android:paddingRight="@dimen/dp_15"
+            android:textColor="@color/color_white"
+            android:text="Hi there i'm using TheMessanger"
+            android:layout_below="@id/tv_name"
+            android:layout_centerHorizontal="true"
+            android:textSize="@dimen/big"/>
+
+        <TextView
+            android:id="@+id/tv_change_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#FA5908"
+            fontPath="OpenSans-Semibold.ttf"
+            android:textColor="@color/color_white"
+            android:text="@string/s_change_status"
+            android:paddingTop="@dimen/dp_10"
+            android:paddingBottom="@dimen/dp_10"
+            android:paddingLeft="@dimen/dp_15"
+            android:paddingRight="@dimen/dp_15"
+            android:textAllCaps="true"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="@dimen/dp_25"/>
+
+
+        <TextView
+            android:id="@+id/tv_change_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/color_white"
+            fontPath="OpenSans-Semibold.ttf"
+            android:textColor="#A608FA"
+            android:text="@string/s_change_image"
+            android:paddingTop="@dimen/dp_10"
+            android:paddingBottom="@dimen/dp_10"
+            android:paddingLeft="@dimen/dp_15"
+            android:paddingRight="@dimen/dp_15"
+            android:textAllCaps="true"
+            android:layout_centerHorizontal="true"
+           android:layout_above="@id/tv_change_status"
+            android:layout_marginBottom="@dimen/dp_25"
+            tools:ignore="MissingPrefix" />
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/dp_5"
+    android:layout_marginLeft="@dimen/dp_10"
+    android:layout_marginRight="@dimen/dp_50">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/rl_message">
+        <TextView
+            android:id="@+id/tv_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/drawable_other_user_chat_background"
+            tools:text="Hii this is first message"
+            android:textColor="@color/color_black"
+            android:padding="@dimen/dp_10"/>
+
+
+        <ImageView
+            android:id="@+id/iv_image"
+            android:layout_width="@dimen/dp_150"
+            android:layout_height="@dimen/dp_150"
+            android:background="@drawable/drawable_other_user_chat_background"
+            android:textColor="@color/color_white"
+            android:layout_alignParentLeft="true"
+            android:padding="@dimen/dp_10"/>
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/dp_60"
+            android:layout_alignTop="@id/iv_image"
+            android:layout_alignLeft="@id/iv_image"
+            android:layout_alignBottom="@id/iv_image"
+            android:layout_alignRight="@id/iv_image"/>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="11:30 AM"
+        android:layout_below="@id/rl_message"
+        android:textSize="@dimen/small"
+        />
+</RelativeLayout>

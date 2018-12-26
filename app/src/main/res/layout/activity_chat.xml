@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/root_layout">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryDark"
+        android:paddingTop="@dimen/dp_10"
+        android:paddingBottom="@dimen/dp_10"
+        android:id="@+id/toolbar">
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_arrow_back_white_24dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="false"
+            android:layout_marginLeft="@dimen/dp_10"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/iv_back"
+            android:layout_toLeftOf="@+id/iv_chat_user_pic"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/dp_10"
+            android:layout_marginRight="@dimen/dp_10"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/tv_chat_user_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/s_flash_dev"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/big"
+                android:textStyle="bold"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/tv_last_seen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/s_flash_dev"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/small"/>
+                <TextView
+                    android:id="@+id/tv_typing"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/s_flash_dev"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/small"/>
+            </RelativeLayout>
+        </LinearLayout>
+
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@id/iv_chat_user_pic"
+            android:layout_width="@dimen/dp_35"
+            android:layout_height="@dimen/dp_35"
+            android:src="@drawable/ic_chat_image_placeholder"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/dp_10"
+            android:layout_alignParentRight="true"/>
+
+
+    </RelativeLayout>
+
+
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view_chat"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar"
+        android:layout_above="@+id/rl_new_message_container"
+        app:layoutManager="LinearLayoutManager"
+        android:background="@color/colorLightGray"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1"
+        android:layout_above="@+id/rl_new_message_container"
+        android:background="@color/colorPrimary"/>
+
+    <RelativeLayout
+        android:id="@+id/rl_new_message_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true">
+
+        <ImageView
+            android:id="@+id/iv_add_files"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_attachment_black_24dp"
+            android:padding="@dimen/dp_10"
+            android:background="@color/grey_300"/>
+        <EditText
+            android:id="@+id/et_message_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/s_type_message"
+            android:layout_toRightOf="@id/iv_add_files"
+            android:gravity="center_vertical"
+            android:inputType="text"
+            android:background="@null"
+            android:layout_toLeftOf="@+id/iv_send"
+            android:layout_centerVertical="true"
+            android:padding="@dimen/dp_10"
+            android:textSize="@dimen/normal"/>
+
+        <ImageView
+            android:id="@id/iv_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_send_black_24dp"
+            android:padding="@dimen/dp_10"
+            android:background="@color/grey_300"/>
+    </RelativeLayout>
+
+
+</RelativeLayout>

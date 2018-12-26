@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:id="@+id/root_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/civ_profile_pic"
+            android:layout_width="@dimen/dp_70"
+            android:layout_height="@dimen/dp_70"
+            android:layout_centerVertical="true"
+            android:padding="@dimen/dp_10"
+            android:src="@drawable/ic_chat_image_placeholder" />
+
+        <LinearLayout
+            android:id="@+id/ll_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/civ_online_status"
+            android:layout_toRightOf="@id/civ_profile_pic"
+            android:orientation="vertical"
+            android:padding="@dimen/dp_10">
+
+            <TextView
+                android:id="@+id/tv_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="PC Patidar"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/big" />
+
+            <TextView
+                android:id="@+id/tv_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Busy"
+                android:textSize="@dimen/normal" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_request_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Busy"
+            android:textSize="@dimen/normal"
+            android:layout_alignParentRight="true"
+            android:padding="@dimen/dp_10"/>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_accept_reject_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/root_layout"
+        android:weightSum="2">
+        <TextView
+            android:id="@+id/accept"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/s_accept_request"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:textColor="@color/color_white"
+            android:background="#17a710"
+            android:padding="@dimen/dp_7"
+            android:layout_marginLeft="@dimen/dp_10"/>
+        <TextView
+            android:id="@+id/tv_reject_request"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/s_reject_request"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:textColor="@color/color_white"
+            android:background="@color/color_red"
+            android:padding="@dimen/dp_7"
+            android:layout_marginLeft="@dimen/dp_10"
+            android:layout_marginRight="@dimen/dp_10"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_cancel_request"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/s_cancel_request"
+        android:layout_below="@id/root_layout"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"
+        android:textColor="@color/color_white"
+        android:background="@color/color_red"
+        android:paddingTop="@dimen/dp_7"
+        android:paddingBottom="@dimen/dp_7"
+        android:paddingLeft="@dimen/dp_65"
+        android:paddingRight="@dimen/dp_65"
+        android:layout_marginLeft="@dimen/dp_10"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1"
+        android:layout_below="@+id/ll_accept_reject_container"
+        android:layout_marginTop="@dimen/dp_5"
+        android:background="@color/colorPrimaryDark"
+        android:layout_marginRight="@dimen/dp_8"
+        android:layout_marginLeft="@dimen/dp_8"/>
+</RelativeLayout>

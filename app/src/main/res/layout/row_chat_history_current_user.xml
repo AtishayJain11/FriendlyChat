@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/root_layout">
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/root_frame">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/civ_profile_pic"
+            android:layout_width="@dimen/dp_70"
+            android:layout_height="@dimen/dp_70"
+            android:src="@drawable/ic_chat_image_placeholder"
+            android:layout_centerVertical="true"
+            android:padding="@dimen/dp_10"/>
+    </FrameLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/root_frame"
+        android:padding="@dimen/dp_10"
+        android:orientation="vertical"
+        android:id="@+id/ll_container"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/civ_online_status">
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PC Patidar"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/big"/>
+
+        <TextView
+            android:id="@+id/tv_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Busy"
+            android:textSize="@dimen/normal"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Yesterday"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginRight="@dimen/dp_10"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1"
+        android:background="@color/colorPrimaryDark"
+        android:layout_below="@id/root_frame"/>
+
+    <TextView
+        android:id="@+id/tv_count"
+        android:layout_width="@dimen/dp_20"
+        android:layout_height="@dimen/dp_20"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginRight="@dimen/dp_10"
+        android:layout_below="@id/tv_time"
+        android:text="99"
+        android:textColor="@color/color_white"
+        android:gravity="center"
+        android:textSize="@dimen/ultra_small"
+        android:background="@drawable/drawable_circle_green"
+        />
+</RelativeLayout>

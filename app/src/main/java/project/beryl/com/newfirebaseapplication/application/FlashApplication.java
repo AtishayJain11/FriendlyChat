@@ -15,10 +15,10 @@ import project.beryl.com.newfirebaseapplication.R;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 
-@ReportsCrashes(// will not be used
+/*@ReportsCrashes(// will not be used
         mailTo = "punamchand.4488@gmail.com, pcpatidar.4488@gmail.com",
         mode = ReportingInteractionMode.TOAST,
-        resToastText = R.string.crash_toast_text)
+        resToastText = R.string.crash_toast_text)*/
 
 public class FlashApplication extends Application {
 

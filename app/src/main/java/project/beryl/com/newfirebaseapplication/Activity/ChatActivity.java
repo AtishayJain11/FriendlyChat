@@ -2,21 +2,33 @@ package project.beryl.com.newfirebaseapplication.Activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.app.Person;
+import android.support.v4.app.RemoteInput;
+import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -45,8 +57,15 @@ import java.util.Map;
 import project.beryl.com.newfirebaseapplication.R;
 import project.beryl.com.newfirebaseapplication.adapter.MessagesAdapter;
 import project.beryl.com.newfirebaseapplication.model.MessageModel;
+import project.beryl.com.newfirebaseapplication.notification.GlobalNotificationBuilder;
+import project.beryl.com.newfirebaseapplication.notification.MessagingIntentService;
+import project.beryl.com.newfirebaseapplication.notification.MockDatabase;
+import project.beryl.com.newfirebaseapplication.notification.NotificationUtil;
 import project.beryl.com.newfirebaseapplication.utils.AppSharedPreferences;
 import project.beryl.com.newfirebaseapplication.utils.GetTimeAgo;
+
+import static project.beryl.com.newfirebaseapplication.Activity.MainActivity.NOTIFICATION_ID;
+
 
 public class ChatActivity extends BaseActivity implements View.OnClickListener {
 
@@ -55,6 +74,7 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
     private ImageView ivBack, ivAddFiles, ivUserChatImage, ivSend;
     private TextView tvChatUserName, tvLastSeen, tvTyping;
     private EditText etTextMessage;
+    private RelativeLayout root_layout;
     private DatabaseReference mDataBaseReferense;
     private String other_user_id;
     private RecyclerView rvMessages;
@@ -67,6 +87,8 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
     private Uri imageUri;
     private String message_push_id;
 
+    private NotificationManagerCompat mNotificationManagerCompat;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,12 +96,14 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
         setContentView(R.layout.activity_chat);
         initViews();
         initialPageSetUp();
+        mNotificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
     }
 
     /**
      * method for initializing views
      */
     private void initViews() {
+        root_layout = (RelativeLayout)findViewById(R.id.root_layout);
         ivBack = (ImageView)findViewById(R.id.iv_back);
         ivUserChatImage = (ImageView)findViewById(R.id.iv_chat_user_pic);
         tvChatUserName = (TextView)findViewById(R.id.tv_chat_user_name);
@@ -442,7 +466,7 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
 
     }
 
-    private  void updateChatHistory(Map currentUserChatMap, Map otherUserChatMap, Map message, String message_push_id) {
+    private  void updateChatHistory(Map currentUserChatMap, final Map otherUserChatMap, Map message, String message_push_id) {
 
         Map updateMessageAndList = new HashMap();
         updateMessageAndList.put("/messages" +"/"+ FirebaseAuth.getInstance().getCurrentUser().getUid() +"/"+ other_user_id + "/" + message_push_id, message);
@@ -454,6 +478,7 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
             @Override
             public void onComplete(@NonNull Task task) {
               //  Toast.makeText(ChatActivity.this, "Updated", Toast.LENGTH_SHORT).show();
+                generateMessagingStyleNotification(otherUserChatMap);
             }
         });
     }
@@ -528,4 +553,146 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
             });
         }
     }
+
+
+
+    private void generateMessagingStyleNotification(Map otherUserChatMap) {
+
+     //   Log.d(TAG, "generateMessagingStyleNotification()");
+
+        MockDatabase.MessagingStyleCommsAppData messagingStyleCommsAppData = MockDatabase.getMessagingStyleData(getApplicationContext(),otherUserChatMap);
+
+        String notificationChannelId = NotificationUtil.createNotificationChannel(this, messagingStyleCommsAppData);
+
+        // 2. Build the NotificationCompat.Style (MESSAGING_STYLE).
+        String contentTitle = messagingStyleCommsAppData.getContentTitle();
+
+        NotificationCompat.MessagingStyle messagingStyle =
+                new NotificationCompat.MessagingStyle(messagingStyleCommsAppData.getMe())
+                        .setConversationTitle(contentTitle);
+
+        // Adds all Messages.
+        // Note: Messages include the text, timestamp, and sender.
+        for (NotificationCompat.MessagingStyle.Message message : messagingStyleCommsAppData.getMessages()) {
+            messagingStyle.addMessage(message);
+        }
+
+        messagingStyle.setGroupConversation(messagingStyleCommsAppData.isGroupConversation());
+
+        // 3. Set up main Intent for notification.
+        Intent notifyIntent = new Intent(this, ChatActivity.class);
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        // Adds the back stack
+        stackBuilder.addParentStack(ChatActivity.class);
+        // Adds the Intent to the top of the stack
+        stackBuilder.addNextIntent(notifyIntent);
+        // Gets a PendingIntent containing the entire back stack
+        PendingIntent mainPendingIntent =
+                PendingIntent.getActivity(
+                        this,
+                        0,
+                        notifyIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+
+
+        // 4. Set up RemoteInput, so users can input (keyboard and voice) from notification.
+
+        String replyLabel = getString(R.string.reply_label);
+        RemoteInput remoteInput = new RemoteInput.Builder(MessagingIntentService.EXTRA_REPLY)
+                .setLabel(replyLabel)
+                // Use machine learning to create responses based on previous messages.
+                .setChoices(messagingStyleCommsAppData.getReplyChoicesBasedOnLastMessage())
+                .build();
+
+        // Pending intent =
+        //      API <24 (M and below): activity so the lock-screen presents the auth challenge.
+        //      API 24+ (N and above): this should be a Service or BroadcastReceiver.
+        PendingIntent replyActionPendingIntent;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Intent intent = new Intent(this, MessagingIntentService.class);
+            intent.setAction(MessagingIntentService.ACTION_REPLY);
+            replyActionPendingIntent = PendingIntent.getService(this, 0, intent, 0);
+
+        } else {
+            replyActionPendingIntent = mainPendingIntent;
+        }
+
+        NotificationCompat.Action replyAction =
+                new NotificationCompat.Action.Builder(
+                        R.drawable.ic_reply_white_18dp,
+                        replyLabel,
+                        replyActionPendingIntent)
+                        .addRemoteInput(remoteInput)
+                        // Informs system we aren't bringing up our own custom UI for a reply
+                        // action.
+                        .setShowsUserInterface(false)
+                        // Allows system to generate replies by context of conversation.
+                        .setAllowGeneratedReplies(true)
+                        .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_REPLY)
+                        .build();
+
+
+        // 5. Build and issue the notification.
+
+        // Because we want this to be a new notification (not updating current notification), we
+        // create a new Builder. Later, we update this same notification, so we need to save this
+        // Builder globally (as outlined earlier).
+
+        NotificationCompat.Builder notificationCompatBuilder =
+                new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+        GlobalNotificationBuilder.setNotificationCompatBuilderInstance(notificationCompatBuilder);
+
+        notificationCompatBuilder
+                // MESSAGING_STYLE sets title and content for API 16 and above devices.
+                .setStyle(messagingStyle)
+                // Title for API < 16 devices.
+                .setContentTitle(contentTitle)
+                // Content for API < 16 devices.
+                .setContentText(messagingStyleCommsAppData.getContentText())
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setLargeIcon(BitmapFactory.decodeResource(
+                        getResources(),
+                        R.drawable.ic_launcher))
+                .setContentIntent(mainPendingIntent)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                // Set primary color (important for Wear 2.0 Notifications).
+                .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary))
+
+                // SIDE NOTE: Auto-bundling is enabled for 4 or more notifications on API 24+ (N+)
+                // devices and all Wear devices. If you have more than one notification and
+                // you prefer a different summary notification, set a group key and create a
+                // summary notification via
+                // .setGroupSummary(true)
+                // .setGroup(GROUP_KEY_YOUR_NAME_HERE)
+
+                // Number of new notifications for API <24 (M and below) devices.
+                .setSubText(Integer.toString(messagingStyleCommsAppData.getNumberOfNewMessages()))
+
+                .addAction(replyAction)
+                .setCategory(Notification.CATEGORY_MESSAGE)
+
+                // Sets priority for 25 and below. For 26 and above, 'priority' is deprecated for
+                // 'importance' which is set in the NotificationChannel. The integers representing
+                // 'priority' are different from 'importance', so make sure you don't mix them.
+                .setPriority(messagingStyleCommsAppData.getPriority())
+
+                // Sets lock-screen visibility for 25 and below. For 26 and above, lock screen
+                // visibility is set in the NotificationChannel.
+                .setVisibility(messagingStyleCommsAppData.getChannelLockscreenVisibility());
+
+        // If the phone is in "Do not disturb" mode, the user may still be notified if the
+        // sender(s) are in a group allowed through "Do not disturb" by the user.
+        for (Person name : messagingStyleCommsAppData.getParticipants()) {
+            notificationCompatBuilder.addPerson(name.getUri());
+        }
+
+        Notification notification = notificationCompatBuilder.build();
+        mNotificationManagerCompat.notify(NOTIFICATION_ID, notification);
+    }
+
+
 }

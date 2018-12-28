@@ -73,7 +73,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
        // etPassword.setHint("Enter your password");
         auth=FirebaseAuth.getInstance();
         firebaseDatabase=FirebaseDatabase.getInstance();
-
+        pd = new ProgressDialog(this);
+        pd.setMessage("Please wait....");
         SpannableString styledString = new SpannableString(tvSignUp.getText().toString());   // index 103 - 112
         ClickableSpan clickableSpan = new ClickableSpan() {
             @Override
@@ -169,12 +170,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void loginApiCall(){
-        AppUtils.getInstance().showProgessDialog(this);
+       // AppUtils.getInstance().showProgessDialog(this);
+        pd.show();
         auth.signInWithEmailAndPassword(etUsermail.getText().toString(),etPassword.getText().toString())
                 .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (!task.isSuccessful()){
+                            pd.dismiss();
                             AppUtils.getInstance().showSnackBar("Login fail",linearLayout);
                         }else {
                             firebaseUser=auth.getCurrentUser();

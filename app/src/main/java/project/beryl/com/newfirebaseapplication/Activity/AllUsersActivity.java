@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -83,26 +84,26 @@ public class AllUsersActivity extends AppCompatActivity implements View.OnClickL
 
             @Override
             public void afterTextChanged(Editable editable) {
-              /*  if(editable.toString().trim().length() != 0) {*/
-                    mFirebaseDatabase.getReference().child("Users").orderByChild("name")
-                            .startAt(etSearch.getText().toString())
-                            .endAt(etSearch.getText().toString()+"\uf8ff").addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    userList.clear();
-                                    for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                        if (!child.getRef().getKey().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
-                                            userList.add(child.getValue(UserModel.class));
-                                    }
+                /*  if(editable.toString().trim().length() != 0) {*/
+                mFirebaseDatabase.getReference().child("Users").orderByChild("name")
+                        .startAt(etSearch.getText().toString())
+                        .endAt(etSearch.getText().toString() + "\uf8ff").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        userList.clear();
+                        for (DataSnapshot child : dataSnapshot.getChildren()) {
+                            if (!child.getRef().getKey().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
+                                userList.add(child.getValue(UserModel.class));
+                        }
 
-                                    allUserAdapter.notifyDataSetChanged();
-                                }
+                        allUserAdapter.notifyDataSetChanged();
+                    }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                                }
-                            });
+                    }
+                });
                /* } else {
                     hitAllUserApi();
                 }*/
@@ -112,13 +113,17 @@ public class AllUsersActivity extends AppCompatActivity implements View.OnClickL
 
     private void hitAllUserApi() {
 
-        if(!isFinishing()) {
+        if (!isFinishing()) {
             mFirebaseDatabase.getReference().child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     for (DataSnapshot child : dataSnapshot.getChildren()) {
-                        if (!child.getRef().getKey().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
-                            userList.add(child.getValue(UserModel.class));
+                        if (!child.getRef().getKey().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                            UserModel userModel = child.getValue(UserModel.class);
+                            if (userModel.user_id!=null){
+                                userList.add(userModel);
+                            }
+                        }
                     }
 
                     allUserAdapter.notifyDataSetChanged();
@@ -141,18 +146,17 @@ public class AllUsersActivity extends AppCompatActivity implements View.OnClickL
                 break;
 
             case R.id.iv_search:
-                 if(ivSearch.getTag().equals("Search")){
-                     tvTitle.setVisibility(View.INVISIBLE);
-                     etSearch.setVisibility(View.VISIBLE);
-                     ivSearch.setTag("Done");
-                     ivSearch.setImageResource(R.drawable.ic_check_circle_white_24dp);
-                 }else {
-                     tvTitle.setVisibility(View.VISIBLE);
-                     etSearch.setVisibility(View.INVISIBLE);
-                     ivSearch.setTag("Search");
-                     ivSearch.setImageResource(R.drawable.ic_search_white_24dp);
-
-                 }
+                if (ivSearch.getTag().equals("Search")) {
+                    tvTitle.setVisibility(View.INVISIBLE);
+                    etSearch.setVisibility(View.VISIBLE);
+                    ivSearch.setTag("Done");
+                    ivSearch.setImageResource(R.drawable.ic_check_circle_white_24dp);
+                } else {
+                    tvTitle.setVisibility(View.VISIBLE);
+                    etSearch.setVisibility(View.INVISIBLE);
+                    ivSearch.setTag("Search");
+                    ivSearch.setImageResource(R.drawable.ic_search_white_24dp);
+                }
                 break;
         }
     }

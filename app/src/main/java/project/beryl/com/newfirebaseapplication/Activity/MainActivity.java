@@ -1,18 +1,22 @@
 package project.beryl.com.newfirebaseapplication.Activity;
 
+import android.app.ActivityManager;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,6 +27,7 @@ import com.google.firebase.database.ServerValue;
 import de.hdodenhof.circleimageview.CircleImageView;
 import project.beryl.com.newfirebaseapplication.R;
 import project.beryl.com.newfirebaseapplication.adapter.PagerAdapter;
+import project.beryl.com.newfirebaseapplication.background_service.ServiceNoDelay;
 import project.beryl.com.newfirebaseapplication.utils.AppSharedPreferences;
 
 
@@ -33,7 +38,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private TabLayout tabLayout;
     private ProgressDialog pd;
     private DatabaseReference mDatabaseReference;
-
+    public static final int NOTIFICATION_ID = 888;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +48,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         //requestWindowFeature(Window.FEATURE_NO_TITLE);
        // this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
+
+        // Background Service
+        ServiceNoDelay mSensorService = new ServiceNoDelay(getApplicationContext());
+        Intent mServiceIntent = new Intent(getApplicationContext(), mSensorService.getClass());
+        if (!isMyServiceRunning(mSensorService.getClass())) {
+            Toast.makeText(this, "Service stop", Toast.LENGTH_SHORT).show();
+            startService(mServiceIntent);
+        }
+
         initViews();
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
@@ -173,5 +187,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         super.onStop();
         mDatabaseReference.child("online").setValue(ServerValue.TIMESTAMP);
 
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                Log.i ("isMyServiceRunning?", true+"");
+                return true;
+            }
+        }
+        Log.i ("isMyServiceRunning?", false+"");
+        return false;
     }
 }

@@ -38,6 +38,31 @@
         <activity android:name=".Activity.ChatActivity" />
         <activity android:name=".Activity.GroupActivity" />
         <activity android:name=".Activity.CreateGroupActivity" />
+
+        <activity
+            android:name=".notification.MessagingMainActivity"
+            android:label="@string/title_activity_messaging_main">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Activity.MainActivity"/>
+        </activity>
+        <service
+            android:name=".notification.MessagingIntentService"
+            android:exported="false">
+        </service>
+
+        <service
+            android:name=".background_service.ServiceNoDelay"
+            android:enabled="true" />
+        <receiver
+            android:name=".background_service.SensorRestarterBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:label="RestartServiceWhenStopped">
+            <intent-filter>
+                <action android:name="ac.in.ActivityRecognition.RestartSensor" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

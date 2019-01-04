@@ -20,6 +20,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Bundle;
 import project.beryl.com.newfirebaseapplication.Activity.ChatActivity;
+import project.beryl.com.newfirebaseapplication.Activity.MainActivity;
 import project.beryl.com.newfirebaseapplication.R;
 
 /**
@@ -39,7 +40,7 @@ public class MessagingMainActivity extends Activity {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.cancel(ChatActivity.NOTIFICATION_ID);
+        notificationManager.cancel(MainActivity.NOTIFICATION_ID);
 
         // TODO: Handle and display message/conversation from your database
         // NOTE: You can retrieve the EXTRA_REMOTE_INPUT_DRAFT sent by the system when a user

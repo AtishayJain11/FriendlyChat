@@ -76,7 +76,7 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
     private EditText etTextMessage;
     private RelativeLayout root_layout;
     private DatabaseReference mDataBaseReferense;
-    private String other_user_id;
+    public static String other_user_id;
     private RecyclerView rvMessages;
     private ArrayList<MessageModel> messageList;
     private MessagesAdapter messagesAdapter;
@@ -86,7 +86,7 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
     private boolean typingStarted;
     private Uri imageUri;
     private String message_push_id;
-
+    public static Map map;
     private NotificationManagerCompat mNotificationManagerCompat;
 
     @Override
@@ -552,6 +552,61 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
                 }
             });
         }
+    }
+
+    public static Map fetchMessage() {
+        map = new HashMap();
+        map.put("name",FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+        map.put("last_message",FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+       /* if (other_user_id!=null){
+            DatabaseReference mDataBaseReferense;
+            mDataBaseReferense = FirebaseDatabase.getInstance().getReference();
+            mDataBaseReferense.child("messages").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                    .child(other_user_id).addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    String messageTexts = null;
+                    if (dataSnapshot.child("message_text").getValue()!=null){
+                        messageTexts = dataSnapshot.child("message_text").getValue().toString();
+                    }
+                    String seen = dataSnapshot.child("seen").getValue().toString();
+                    String time = String.valueOf(dataSnapshot.child("time").getValue());
+                    String type = dataSnapshot.child("type").getValue().toString();
+                    String from = dataSnapshot.child("from").getValue().toString();
+
+                    Date date=new Date(Long.valueOf(time));
+                    Format formatter = new SimpleDateFormat("EEE, MMM d, yyyy");
+                    final String messageTime = formatter.format(date);
+
+                    MessageModel message = new MessageModel(messageTexts, seen, messageTime, type, from);
+
+                    map.put("name",FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+                    map.put("last_message",FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });*/
+       // }
+
+
+        return map;
     }
 
 

@@ -53,7 +53,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         ServiceNoDelay mSensorService = new ServiceNoDelay(getApplicationContext());
         Intent mServiceIntent = new Intent(getApplicationContext(), mSensorService.getClass());
         if (!isMyServiceRunning(mSensorService.getClass())) {
-            Toast.makeText(this, "Service stop", Toast.LENGTH_SHORT).show();
+         //   Toast.makeText(this, "Service stop", Toast.LENGTH_SHORT).show();
             startService(mServiceIntent);
         }
 

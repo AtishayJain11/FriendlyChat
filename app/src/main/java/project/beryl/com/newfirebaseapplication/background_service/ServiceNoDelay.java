@@ -18,6 +18,16 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
@@ -25,6 +35,7 @@ import java.util.TimerTask;
 
 import project.beryl.com.newfirebaseapplication.Activity.ChatActivity;
 import project.beryl.com.newfirebaseapplication.R;
+import project.beryl.com.newfirebaseapplication.model.MessageModel;
 import project.beryl.com.newfirebaseapplication.notification.GlobalNotificationBuilder;
 import project.beryl.com.newfirebaseapplication.notification.MessagingIntentService;
 import project.beryl.com.newfirebaseapplication.notification.MessagingMainActivity;
@@ -43,9 +54,8 @@ public class ServiceNoDelay extends Service {
         super();
         map = new HashMap();
         context = applicationContext;
-        Toast.makeText(context, "Service start", Toast.LENGTH_SHORT).show();
+       // Toast.makeText(context, "Service start", Toast.LENGTH_SHORT).show();
         Log.i("HERE", "here service created!");
-        mNotificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
     }
 
     public ServiceNoDelay() {
@@ -54,8 +64,10 @@ public class ServiceNoDelay extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        map.put("name","PC Patidar");
-        map.put("last_message","Hello");
+       ChatActivity.fetchMessage();
+        /*if (map!=null && map.size()>0){
+            generateMessagingStyleNotification(map);
+        }*/
         startTimer();
         return START_STICKY;
     }
@@ -82,13 +94,16 @@ public class ServiceNoDelay extends Service {
         initializeTimerTask();
 
         //schedule the timer, to wake up every 1 second
-        timer.schedule(timerTask, 2*1000, 1000); //
+        timer.schedule(timerTask, 20*1000, 1000); //
     }
 
     public void initializeTimerTask() {
         timerTask = new TimerTask() {
             public void run() {
-               // generateMessagingStyleNotification();
+               /* Map map = ChatActivity.fetchMessage();
+                if (map!=null && map.size()>0){
+                    generateMessagingStyleNotification(map);
+                }*/
                 Log.i("in timer", "in timer ++++  " + (counter++));
             }
         };
@@ -111,10 +126,10 @@ public class ServiceNoDelay extends Service {
      private void generateMessagingStyleNotification(Map otherUserChatMap) {
 
      //   Log.d(TAG, "generateMessagingStyleNotification()");
-
+         mNotificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
         MockDatabase.MessagingStyleCommsAppData messagingStyleCommsAppData = MockDatabase.getMessagingStyleData(getApplicationContext(),otherUserChatMap);
 
-        String notificationChannelId = NotificationUtil.createNotificationChannel(this, messagingStyleCommsAppData);
+        String notificationChannelId = NotificationUtil.createNotificationChannel(getApplicationContext(), messagingStyleCommsAppData);
 
         // 2. Build the NotificationCompat.Style (MESSAGING_STYLE).
         String contentTitle = messagingStyleCommsAppData.getContentTitle();

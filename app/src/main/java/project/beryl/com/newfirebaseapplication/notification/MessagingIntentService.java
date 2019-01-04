@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import project.beryl.com.newfirebaseapplication.Activity.ChatActivity;
+import project.beryl.com.newfirebaseapplication.Activity.MainActivity;
 import project.beryl.com.newfirebaseapplication.R;
 
 
@@ -120,7 +121,7 @@ public class MessagingIntentService extends IntentService {
             // Pushes out the updated Notification
             NotificationManagerCompat notificationManagerCompat =
                     NotificationManagerCompat.from(getApplicationContext());
-            notificationManagerCompat.notify(ChatActivity.NOTIFICATION_ID, notification);
+            notificationManagerCompat.notify(MainActivity.NOTIFICATION_ID, notification);
         }
     }
 
